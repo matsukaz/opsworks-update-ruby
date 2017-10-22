@@ -1,0 +1,5 @@
+name        "opsworks-update-ruby"
+description "Ruby update receipes for Opsworks"
+maintainer  "matsukaz"
+maintainer_email "matsukaz@gmail.com"
+version     "1.0.0"
