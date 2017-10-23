@@ -1,4 +1,5 @@
 ruby_version = node[:ruby][:update_version]
+bundler_version = node[:ruby][:update_bundler_version]
 
 package "readline-devel" do
   retries 3
@@ -28,7 +29,6 @@ bash "install_ruby_build" do
   code "./install.sh"
   action :run
 end
-
 template "rbenv.sh" do
   path "/etc/profile.d/rbenv.sh"
   owner "root"
@@ -38,7 +38,7 @@ template "rbenv.sh" do
 end
 
 bash "rbenv install" do
-  code   "source /etc/profile.d/rbenv.sh; rbenv install #{ruby_version}"
+  code   "source /etc/profile.d/rbenv.sh; CONFIGURE_OPTS=\"--disable-install-rdoc\" rbenv install -v #{ruby_version}"
   action :run
   not_if { ::File.exists?("/usr/local/rbenv/versions/#{ruby_version}") }
 end
@@ -51,5 +51,16 @@ end
 bash "rbenv global" do
     code   "source /etc/profile.d/rbenv.sh; rbenv global #{ruby_version}"
     action :run
+end
+
+bash "bundler install" do
+  code   "source /etc/profile.d/rbenv.sh; gem install bundler -v #{bundler_version}"
+  action :run
+end
+
+bash "replace bundle" do
+  code   "mv /usr/local/bin/bundle /usr/local/bin/bundle_system;cp /usr/local/rbenv/shims/bundle /usr/local/bin/bundle"
+  action :run
+  only_if { ::File.exists?("/usr/local/rbenv/shims/bundle") }
 end
 
