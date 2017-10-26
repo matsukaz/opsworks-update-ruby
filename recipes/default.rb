@@ -58,9 +58,11 @@ bash "bundler install" do
   action :run
 end
 
-bash "replace bundle" do
-  code   "mv /usr/local/bin/bundle /usr/local/bin/bundle_system;cp /usr/local/rbenv/shims/bundle /usr/local/bin/bundle"
-  action :run
-  only_if { ::File.exists?("/usr/local/rbenv/shims/bundle") }
+%w{bundle bundler rake gem ruby}.each do |target|
+  bash "replace #{target}" do
+    code   "mv /usr/local/bin/#{target} /usr/local/bin/#{target}_system;cp /usr/local/rbenv/shims/#{target} /usr/local/bin/#{target}"
+    action :run
+    only_if { ::File.exists?("/usr/local/rbenv/shims/#{target}") }
+  end
 end
 
